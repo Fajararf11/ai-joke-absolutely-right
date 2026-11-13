@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""ai-joke-03 entry: writes one joke about AI coding agents to /output/entry.txt.
+"""make.fun ai-joke-03 entry: writes one joke about AI coding agents.
 
-Standard library only, no network, deterministic: the two runs the grader makes
-must write the same bytes. Outside the grader's container MAKEFUN_OUTPUT_DIR
-stands in for /output:
+Standard library only, no network, no randomness, no clock: every run writes
+the same bytes. The output directory comes from MAKEFUN_OUTPUT_DIR and
+defaults to /output, so outside the grader's container you can run:
 
     mkdir -p out && MAKEFUN_OUTPUT_DIR=out python3 main.py
 """
@@ -17,15 +17,18 @@ JOKE = (
 )
 
 
-def output_dir() -> Path:
-    """The writable directory the entry writes its joke into."""
-    return Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
-
-
-def main() -> None:
-    target = output_dir()
+def write_entry(out_dir):
+    """Write the joke to <out_dir>/entry.txt and return the path written."""
+    target = Path(out_dir)
     target.mkdir(parents=True, exist_ok=True)
-    (target / "entry.txt").write_text(JOKE, encoding="utf-8")
+    path = target / "entry.txt"
+    path.write_text(JOKE, encoding="utf-8")
+    return path
+
+
+def main():
+    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
+    write_entry(out_dir)
 
 
 if __name__ == "__main__":
